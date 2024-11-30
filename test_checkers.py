@@ -15,63 +15,63 @@ class TestCheckers(unittest.TestCase):
     def tearDown(self):
         pygame.quit()
     
-    def test_obtener_pieza(self):
-        # Verifica que obtener_pieza devuelva la pieza correcta o None si no hay pieza
-        pieza = self.board.obtener_pieza(0, 1)
-        self.assertIsNotNone(pieza, "Se espera una pieza en la posición (0, 1)")
-        self.assertEqual(pieza.color, (255, 255, 255), "La pieza en (0, 1) debería ser blanca")
-        self.assertIsNone(self.board.obtener_pieza(0, 0), "No debería haber pieza en (0, 0)")
+    def test_get_piece(self):
+        # Verifies that get_piece returns the correct piece or None if there is no piece
+        piece = self.board.get_piece(0, 1)
+        self.assertIsNotNone(piece, "A piece is expected at position (0, 1)")
+        self.assertEqual(piece.color, (255, 255, 255), "The piece at (0, 1) should be white")
+        self.assertIsNone(self.board.get_piece(0, 0), "There should be no piece at (0, 0)")
 
-    def test_mover_pieza_valido(self):
-        # Prueba que el método mover_pieza funcione con un movimiento válido
-        pieza = self.board.obtener_pieza(2, 1)
-        resultado = self.board.mover_pieza(pieza, 3, 2)
-        self.assertTrue(resultado, "El movimiento debería ser válido")
-        self.assertEqual((pieza.row, pieza.col), (3, 2), "La pieza debería estar en la posición (3, 2)")
+    def test_move_piece_valid(self):
+        # Tests that the move_piece method works with a valid move
+        piece = self.board.get_piece(2, 1)
+        result = self.board.move_piece(piece, 3, 2)
+        self.assertTrue(result, "The move should be valid")
+        self.assertEqual((piece.row, piece.col), (3, 2), "The piece should be at position (3, 2)")
 
-    def test_mover_pieza_invalido(self):
-        # Prueba que un movimiento inválido no se realice
-        pieza = self.board.obtener_pieza(2, 1)
-        resultado = self.board.mover_pieza(pieza, 5, 5)
-        self.assertFalse(resultado, "El movimiento debería ser inválido")
-        self.assertEqual((pieza.row, pieza.col), (2, 1), "La pieza debería seguir en (2, 1)")
+    def test_move_piece_invalid(self):
+        # Tests that an invalid move does not occur
+        piece = self.board.get_piece(2, 1)
+        result = self.board.move_piece(piece, 5, 5)
+        self.assertFalse(result, "The move should be invalid")
+        self.assertEqual((piece.row, piece.col), (2, 1), "The piece should remain at (2, 1)")
 
-    def test_movimiento_y_captura(self):
-        # Coloca una pieza negra para capturar y verifica el resultado
-        pieza_blanca = self.board.obtener_pieza(2, 1)
-        pieza_negra = Piece(3, 2, (0, 0, 0))
-        self.board.piezas.append(pieza_negra)
-        resultado = self.board.mover_pieza(pieza_blanca, 4, 3)
-        self.assertTrue(resultado, "El movimiento debería ser válido con captura")
-        self.assertNotIn(pieza_negra, self.board.piezas, "La pieza negra debería ser removida")
+    def test_move_and_capture(self):
+        # Places a black piece to capture and verifies the result
+        white_piece = self.board.get_piece(2, 1)
+        black_piece = Piece(3, 2, (0, 0, 0))
+        self.board.pieces.append(black_piece)
+        result = self.board.move_piece(white_piece, 4, 3)
+        self.assertTrue(result, "The move should be valid with capture")
+        self.assertNotIn(black_piece, self.board.pieces, "The black piece should be removed")
 
-    def test_promocion_a_reina(self):
-        # Verifica que una pieza blanca se convierta en reina al alcanzar el extremo
-        pieza = self.board.obtener_pieza(6, 1)
-        self.board.piezas.remove(pieza)
-        pieza = self.board.obtener_pieza(7, 0)
-        self.board.piezas.remove(pieza)
-        pieza= Piece(6,1,(255,255,255))
-        self.board.mover_pieza(pieza, 7, 0)
-        self.assertTrue(pieza.king, "La pieza debería ser una reina")
+    def test_promotion_to_queen(self):
+        # Verifies that a white piece is promoted to a queen upon reaching the end
+        piece = self.board.get_piece(6, 1)
+        self.board.pieces.remove(piece)
+        piece = self.board.get_piece(7, 0)
+        self.board.pieces.remove(piece)
+        piece = Piece(6, 1, (255, 255, 255))
+        self.board.move_piece(piece, 7, 0)
+        self.assertTrue(piece.king, "The piece should be a queen")
 
-    def test_dibujar_tablero(self):
-        # Prueba que el método dibujar_tablero no cause errores
+    def test_draw_board(self):
+        # Tests that the draw_board method does not cause errors
         try:
-            self.board.dibujar_tablero(self.screen)
+            self.board.draw_board(self.screen)
             success = True
         except Exception:
             success = False
-        self.assertTrue(success, "El tablero debería dibujarse sin errores")
+        self.assertTrue(success, "The board should be drawn without errors")
 
-    def test_dibujar_piezas(self):
-        # Prueba que el método dibujar_piezas no cause errores
+    def test_draw_pieces(self):
+        # Tests that the draw_pieces method does not cause errors
         try:
-            self.board.dibujar_piezas(self.screen)
+            self.board.draw_pieces(self.screen)
             success = True
         except Exception:
             success = False
-        self.assertTrue(success, "Las piezas deberían dibujarse sin errores")
+        self.assertTrue(success, "The pieces should be drawn without errors")
 
 if __name__ == '__main__':
     unittest.main()
