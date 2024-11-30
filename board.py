@@ -1,89 +1,85 @@
 import pygame
-from gadgets import ROWS as FILAS , COLS as COLUMNAS , SQUARE_SIZE as TAMAÑO_CASILLA , WHITE as BLANCO, BLACK, GRAY, LIGHT_GRAY
-from piece import Piece 
+from gadgets import ROWS as ROWS, COLS as COLS, SQUARE_SIZE as SQUARE_SIZE, WHITE as WHITE, BLACK, GRAY, LIGHT_GRAY
+from piece import Piece
 
 class Board:
     def __init__(self):
-        self.piezas = self.colocar_piezas()
+        self.pieces = self.place_pieces()
 
-    def dibujar_tablero(self, ventana):
-        ventana.fill(BLANCO)
-        for fila in range(FILAS):
-            for col in range(COLUMNAS):
-                if (fila + col) % 2 != 0:
-                    pygame.draw.rect(ventana, (60,60,60), 
-                                     (col * TAMAÑO_CASILLA, fila * TAMAÑO_CASILLA, 
-                                      TAMAÑO_CASILLA, TAMAÑO_CASILLA))
+    def draw_board(self, window):
+        window.fill(WHITE)
+        for row in range(ROWS):
+            for col in range(COLS):
+                if (row + col) % 2 != 0:
+                    pygame.draw.rect(window, (60, 60, 60),
+                                     (col * SQUARE_SIZE, row * SQUARE_SIZE,
+                                      SQUARE_SIZE, SQUARE_SIZE))
 
-    def colocar_piezas(self):
-        piezas = []
-        for fila in range(3):
-            for col in range(COLUMNAS):
-                if (fila + col) % 2 != 0:
-                    piezas.append(Piece(fila, col, (255,255,255)))
-        for fila in range(5, 8):
-            for col in range(COLUMNAS):
-                if (fila + col) % 2 != 0:
-                    piezas.append(Piece(fila, col, (0,0,0)))
-        return piezas
+    def place_pieces(self):
+        pieces = []
+        for row in range(3):
+            for col in range(COLS):
+                if (row + col) % 2 != 0:
+                    pieces.append(Piece(row, col, (255, 255, 255)))
+        for row in range(5, 8):
+            for col in range(COLS):
+                if (row + col) % 2 != 0:
+                    pieces.append(Piece(row, col, (0, 0, 0)))
+        return pieces
 
-    def dibujar_piezas(self, ventana):
-        for pieza in self.piezas:
-            pieza.dibujar(ventana)
+    def draw_pieces(self, window):
+        for piece in self.pieces:
+            piece.draw(window)
 
-    def obtener_pieza(self, fila, col):
-        for pieza in self.piezas:
-            if pieza.row == fila and pieza.col == col:
-                return pieza
+    def get_piece(self, row, col):
+        for piece in self.pieces:
+            if piece.row == row and piece.col == col:
+                return piece
         return None
 
-    def mover_pieza(self, pieza, nueva_fila, nueva_columna):
-        pieza_comida = self.puede_comer(pieza, nueva_fila, nueva_columna)
-        if self.movimiento_valido(pieza, nueva_fila, nueva_columna):
-            pieza.row, pieza.col = nueva_fila, nueva_columna
-            
+    def move_piece(self, piece, new_row, new_col):
+        captured_piece = self.can_capture(piece, new_row, new_col)
+        if self.valid_move(piece, new_row, new_col):
+            piece.row, piece.col = new_row, new_col
 
-            if pieza.color == (255,255,255) and nueva_fila == FILAS - 1:
-                pieza.convertir_en_reina()
-            elif pieza.color == (0,0,0) and nueva_fila == 0:
-                pieza.convertir_en_reina()
-                
+            if piece.color == (255, 255, 255) and new_row == ROWS - 1:
+                piece.make_queen()
+            elif piece.color == (0, 0, 0) and new_row == 0:
+                piece.make_queen()
 
-            if pieza_comida:
-                self.piezas.remove(pieza_comida)
+            if captured_piece:
+                self.pieces.remove(captured_piece)
             return True
         return False
 
-    def movimiento_valido(self, pieza, nueva_fila, nueva_columna): 
-        if not (0 <= nueva_fila < FILAS and 0 <= nueva_columna < COLUMNAS):
-            return False  
-
-        if self.obtener_pieza(nueva_fila, nueva_columna) is not None:
+    def valid_move(self, piece, new_row, new_col):
+        if not (0 <= new_row < ROWS and 0 <= new_col < COLS):
             return False
-        delta_fila = nueva_fila - pieza.row
-        delta_col = nueva_columna - pieza.col
-        
-        if abs(delta_fila) == 1 and abs(delta_col) == 1:
- 
-            if (pieza.color == (255,255,255) and delta_fila == 1) or (pieza.color == (0,0,0) and delta_fila == -1) or pieza.king:
+
+        if self.get_piece(new_row, new_col) is not None:
+            return False
+        delta_row = new_row - piece.row
+        delta_col = new_col - piece.col
+
+        if abs(delta_row) == 1 and abs(delta_col) == 1:
+            if (piece.color == (255, 255, 255) and delta_row == 1) or (piece.color == (0, 0, 0) and delta_row == -1) or piece.king:
                 return True
 
-        elif abs(delta_fila) == 2 and abs(delta_col) == 2:
-            # Movimiento de captura
-            return self.puede_comer(pieza, nueva_fila, nueva_columna) is not None
+        elif abs(delta_row) == 2 and abs(delta_col) == 2:
+            # Capture move
+            return self.can_capture(piece, new_row, new_col) is not None
 
         return False
 
-    def puede_comer(self, pieza, nueva_fila, nueva_columna):
-        print (nueva_fila,nueva_columna)
-        delta_fila = (nueva_fila - pieza.row) // 2
-        delta_col = (nueva_columna - pieza.col) // 2
-        print (delta_fila,delta_col)
-        fila_enemiga = pieza.row + delta_fila
-        col_enemiga = pieza.col + delta_col
-        print (fila_enemiga,fila_enemiga)
-        pieza_enemiga = self.obtener_pieza(fila_enemiga, col_enemiga)
-        if pieza_enemiga and pieza_enemiga.color != pieza.color:
-            return pieza_enemiga
+    def can_capture(self, piece, new_row, new_col):
+        print(new_row, new_col)
+        delta_row = (new_row - piece.row) // 2
+        delta_col = (new_col - piece.col) // 2
+        print(delta_row, delta_col)
+        enemy_row = piece.row + delta_row
+        enemy_col = piece.col + delta_col
+        print(enemy_row, enemy_col)
+        enemy_piece = self.get_piece(enemy_row, enemy_col)
+        if enemy_piece and enemy_piece.color != piece.color:
+            return enemy_piece
         return None
-    

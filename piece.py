@@ -1,31 +1,37 @@
 import pygame
-from gadgets import SQUARE_SIZE as TAMAÑO_CASILLA, MEDIUM_GRAY, SQUARE_SIZE
+from gadgets import SQUARE_SIZE as SQUARE_SIZE, MEDIUM_GRAY, SQUARE_SIZE
 
 class Piece:
     FILLED = 13
-    CONTORN = 2
+    OUTLINE = 2
+
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
         self.color = color
         self.king = False
-    def convertir_en_reina(self):
+
+    def make_queen(self):
         self.king = True
-    
-    def dibujar(self, ventana):
-        radius = TAMAÑO_CASILLA//2 - self.FILLED
-        interior =TAMAÑO_CASILLA//2 -self.FILLED + 8
-        
-            
-        pygame.draw.circle(ventana, self.color, ((self.col*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2),
-                                                (self.row*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2)), interior+self.CONTORN)
-        
-        pygame.draw.circle(ventana, MEDIUM_GRAY, ((self.col*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2),
-                                           (self.row*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2)), radius+self.CONTORN)
-        pygame.draw.circle(ventana,self.color, ((self.col*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2),
-                                                (self.row*TAMAÑO_CASILLA)+(TAMAÑO_CASILLA//2)), radius)
+
+    def draw(self, window):
+        radius = SQUARE_SIZE // 2 - self.FILLED
+        inner_radius = SQUARE_SIZE // 2 - self.FILLED + 8
+
+        pygame.draw.circle(window, self.color, ((self.col * SQUARE_SIZE) + (SQUARE_SIZE // 2),
+                                                (self.row * SQUARE_SIZE) + (SQUARE_SIZE // 2)), 
+                           inner_radius + self.OUTLINE)
+
+        pygame.draw.circle(window, MEDIUM_GRAY, ((self.col * SQUARE_SIZE) + (SQUARE_SIZE // 2),
+                                                 (self.row * SQUARE_SIZE) + (SQUARE_SIZE // 2)), 
+                           radius + self.OUTLINE)
+
+        pygame.draw.circle(window, self.color, ((self.col * SQUARE_SIZE) + (SQUARE_SIZE // 2),
+                                                (self.row * SQUARE_SIZE) + (SQUARE_SIZE // 2)), 
+                           radius)
+
         if self.king:
-            pygame.draw.circle(ventana, (255, 215, 0), 
-                               (self.col * TAMAÑO_CASILLA + TAMAÑO_CASILLA // 2,
-                                self.row * TAMAÑO_CASILLA + TAMAÑO_CASILLA // 2), 
-                               TAMAÑO_CASILLA // 2 - 5, 3)
+            pygame.draw.circle(window, (255, 215, 0), 
+                               (self.col * SQUARE_SIZE + SQUARE_SIZE // 2,
+                                self.row * SQUARE_SIZE + SQUARE_SIZE // 2), 
+                               SQUARE_SIZE // 2 - 5, 3)

@@ -1,5 +1,5 @@
 import pygame
-import sys
+from runner import game_run
 MEDIUM_GRAY = (128, 128, 128)
 # Configuración básica
 ANCHO, ALTO = 800, 800
