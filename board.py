@@ -39,36 +39,57 @@ class Board:
 
     def move_piece(self, piece, new_row, new_col):
         captured_piece = self.can_capture(piece, new_row, new_col)
-        if self.valid_move(piece, new_row, new_col):
-            piece.row, piece.col = new_row, new_col
+        if not self.valid_move(piece, new_row, new_col):
+            return False
 
-            if piece.color == (255, 255, 255) and new_row == ROWS - 1:
-                piece.make_queen()
-            elif piece.color == (0, 0, 0) and new_row == 0:
-                piece.make_queen()
+        self.update_position(piece, new_row, new_col)
+        self.promote_to_queen_if_applicable(piece, new_row)
+        self.remove_captured_piece(captured_piece)
+        return True
 
-            if captured_piece:
-                self.pieces.remove(captured_piece)
-            return True
-        return False
+    def update_position(self, piece, new_row, new_col):
+        piece.row, piece.col = new_row, new_col
+
+    def promote_to_queen_if_applicable(self, piece, new_row):
+        if piece.color == (255, 255, 255) and new_row == ROWS - 1:
+            piece.make_queen()
+        elif piece.color == (0, 0, 0) and new_row == 0:
+            piece.make_queen()
+
+    def remove_captured_piece(self, captured_piece):
+        if captured_piece:
+            self.pieces.remove(captured_piece)
+
 
     def valid_move(self, piece, new_row, new_col):
-        if not (0 <= new_row < ROWS and 0 <= new_col < COLS):
+        if not self.is_within_bounds(new_row, new_col):
             return False
-
-        if self.get_piece(new_row, new_col) is not None:
+        if self.is_destination_occupied(new_row, new_col):
             return False
-        delta_row = new_row - piece.row
-        delta_col = new_col - piece.col
+        delta_row, delta_col = new_row - piece.row, new_col - piece.col
+        if self.is_simple_move_valid(piece, delta_row, delta_col):
+            return True
+        elif self.is_capture_move_valid(piece, delta_row, delta_col, new_row, new_col):
+            return True
 
+        return False
+
+    def is_within_bounds(self, row, col):
+        return 0 <= row < ROWS and 0 <= col < COLS
+
+    def is_destination_occupied(self, row, col):
+        return self.get_piece(row, col) is not None
+
+    def is_simple_move_valid(self, piece, delta_row, delta_col):
         if abs(delta_row) == 1 and abs(delta_col) == 1:
-            if (piece.color == (255, 255, 255) and delta_row == 1) or (piece.color == (0, 0, 0) and delta_row == -1) or piece.king:
-                return True
+            return (piece.color == (255, 255, 255) and delta_row == 1) or \
+                (piece.color == (0, 0, 0) and delta_row == -1) or \
+                piece.king
+        return False
 
-        elif abs(delta_row) == 2 and abs(delta_col) == 2:
-            # Capture move
+    def is_capture_move_valid(self, piece, delta_row, delta_col, new_row, new_col):
+        if abs(delta_row) == 2 and abs(delta_col) == 2:
             return self.can_capture(piece, new_row, new_col) is not None
-
         return False
 
     def can_capture(self, piece, new_row, new_col):
