@@ -4,6 +4,7 @@ from runner import game_run
 from board import Board
 from piece import Piece
 from gadgets import LIGHT_GRAY, BLACK
+from drawer import Drawer
 
 class TestCheckers(unittest.TestCase):
     
@@ -11,6 +12,8 @@ class TestCheckers(unittest.TestCase):
         pygame.init()
         self.screen = pygame.display.set_mode((800, 800))
         self.board = Board()
+        self.drawer = Drawer(self.screen)
+        
 
     def tearDown(self):
         pygame.quit()
@@ -58,7 +61,7 @@ class TestCheckers(unittest.TestCase):
     def test_draw_board(self):
         # Tests that the draw_board method does not cause errors
         try:
-            self.board.draw_board(self.screen)
+            self.board.draw_board(self.drawer)
             success = True
         except Exception:
             success = False
@@ -67,7 +70,7 @@ class TestCheckers(unittest.TestCase):
     def test_draw_pieces(self):
         # Tests that the draw_pieces method does not cause errors
         try:
-            self.board.draw_pieces(self.screen)
+            self.board.draw_pieces(self.drawer)
             success = True
         except Exception:
             success = False

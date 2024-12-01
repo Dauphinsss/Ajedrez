@@ -1,4 +1,3 @@
-import pygame
 from gadgets import ROWS as ROWS, COLS as COLS, SQUARE_SIZE as SQUARE_SIZE, WHITE as WHITE, BLACK, GRAY, LIGHT_GRAY
 from piece import Piece
 
@@ -6,14 +5,11 @@ class Board:
     def __init__(self):
         self.pieces = self.place_pieces()
 
-    def draw_board(self, window):
-        window.fill(WHITE)
-        for row in range(ROWS):
-            for col in range(COLS):
-                if (row + col) % 2 != 0:
-                    pygame.draw.rect(window, (60, 60, 60),
-                                     (col * SQUARE_SIZE, row * SQUARE_SIZE,
-                                      SQUARE_SIZE, SQUARE_SIZE))
+    def draw_board(self, drawer):
+        drawer.draw_board(self)
+        
+    def draw_pieces(self, drawer):
+        drawer.draw_pieces(self.pieces)
 
     def place_pieces(self):
         pieces = []
@@ -26,10 +22,6 @@ class Board:
                 if (row + col) % 2 != 0:
                     pieces.append(Piece(row, col, (0, 0, 0)))
         return pieces
-
-    def draw_pieces(self, window):
-        for piece in self.pieces:
-            piece.draw(window)
 
     def get_piece(self, row, col):
         for piece in self.pieces:

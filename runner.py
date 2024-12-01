@@ -2,15 +2,17 @@ import pygame
 import sys
 from gadgets import BLACK, SQUARE_SIZE as SQUARE_SIZE
 from logic import handle_events
+from drawer import Drawer
 
 def game_run(screen, board):
+    drawer = Drawer(screen)
     selected_piece = None
     running = True
     turn = (255, 255, 255)
 
     while running:
-        board.draw_board(screen)
-        board.draw_pieces(screen)
+        board.draw_board(drawer)
+        board.draw_pieces(drawer)
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -30,5 +32,6 @@ def game_run(screen, board):
                 x, y = pygame.mouse.get_pos()
                 new_row, new_col = y // SQUARE_SIZE, x // SQUARE_SIZE
                 if board.move_piece(selected_piece, new_row, new_col):
+                    # Cambiar turno después de un movimiento válido
                     turn = (0, 0, 0) if turn == (255, 255, 255) else (255, 255, 255)
                 selected_piece = None
